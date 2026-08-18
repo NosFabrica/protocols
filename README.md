@@ -8,6 +8,7 @@ One team operates two GitHub organizations — [NosFabrica](https://github.com/N
 
 - `README.md` — this file: the spec index, status ladder, and admission rule
 - `ECOSYSTEM.md` — the canonical map of the estate (organizations, repositories, deployments)
+- `CONCEPTS.md` — the conceptual canon behind the specs: the five-claim model, the cast of roles, and the cross-cutting vocabulary no single spec owns
 - `specs/` — one file per specification, flat. A spec's path never changes after it lands here; its status lives in its header and the index above, not in its location.
 
 ## What belongs here
@@ -18,7 +19,7 @@ In scope:
 
 - **Wire formats** — event kinds, tag names and values, event shapes, resolution algorithms: anything that leaves the machine as signed nostr events that an independent implementation would need to parse or produce to interoperate.
 - **Consumer-facing semantics** — what published values mean, e.g. how to interpret a Trusted Assertion's `rank` and `hops` tags.
-- **Apparatus for implementers** — this index, the status ladder, and the ecosystem/adoption map.
+- **Apparatus for implementers** — this index, the status ladder, the ecosystem/adoption map, and the conceptual canon ([CONCEPTS.md](./CONCEPTS.md)).
 
 Out of scope, and where it lives instead:
 
