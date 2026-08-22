@@ -1,6 +1,6 @@
 # The Brainstorm/Tapestry Ecosystem
 
-**Last updated: 2026-08-17.** The map of the estate behind the specs in this repo: the organizations, repositories, and deployments, and how work flows between them. If you are evaluating these protocols, this file answers *who implements them, where, and at what release stage*.
+**Last updated: 2026-08-22.** The map of the estate behind the specs in this repo: the organizations, repositories, and deployments, and how work flows between them. If you are evaluating these protocols, this file answers *who implements them, where, and at what release stage*.
 
 This file is the **canonical inventory** of the estate: the lists of repositories, hostnames, and roles are normative here. Two related things live elsewhere by design: the security-facing ownership *attestation* belongs to each codebase's SECURITY.md (see [Deployments](#deployments)), and per-host operational *status* belongs to point-in-time surveys (the most recent: the [estate audit](https://github.com/NosFabrica/Brainstorm-UI/blob/main/docs/estate-audit.md) of 2026-08-11/12).
 
@@ -32,6 +32,17 @@ Work graduates from R&D to production: features and specs are developed and prov
 | protocols (this repo) | NosFabrica | Shared protocol specifications and this map. |
 
 **Lineage:** the historical protocol repos [wds4/DCoSL](https://github.com/wds4/DCoSL) and [wds4/tapestry-protocol](https://github.com/wds4/tapestry-protocol) (superseded by the specs indexed here), and the original [Brainstorm prototype](https://github.com/pretty-good-freedom-tech/brainstorm), are the ancestors of the current estate.
+
+### External implementations
+
+Implementations of these protocols maintained outside the estate's two
+organizations. They are inventoried here so *"who implements this?"* keeps one
+answer, but the estate does not operate or attest them — ownership and security
+contact are those repositories' own.
+
+| Repository | Maintainer | Role |
+|---|---|---|
+| [magic-carpet-desktop](https://github.com/matthiasdebernardini/magic-carpet-desktop) | [matthiasdebernardini](https://github.com/matthiasdebernardini) | Desktop auto-payer for Magic Carpet bounties (Rust): consumes Decentralized-Lists claim events and Trusted Assertions to pay bounty claims from the issuer's own machine, so the issuer's nsec never reaches a server. Developed against the `magic-carpet.brainstorm.world` sandbox. |
 
 ## Deployments
 
