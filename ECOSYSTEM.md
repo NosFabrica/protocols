@@ -1,25 +1,26 @@
 # The Brainstorm/Tapestry Ecosystem
 
-**Last updated: 2026-08-22.** The map of the estate behind the specs in this repo: the organizations, repositories, and deployments, and how work flows between them. If you are evaluating these protocols, this file answers *who implements them, where, and at what release stage*.
+**Last updated: 2026-10-28.** The map of the estate behind the specs in this repo: the organizations, repositories, and deployments, and how work flows between them. If you are evaluating these protocols, this file answers *who implements them, where, and at what release stage*.
 
 This file is the **canonical inventory** of the estate: the lists of repositories, hostnames, and roles are normative here. Two related things live elsewhere by design: the security-facing ownership *attestation* belongs to each codebase's SECURITY.md (see [Deployments](#deployments)), and per-host operational *status* belongs to point-in-time surveys (the most recent: the [estate audit](https://github.com/NosFabrica/Brainstorm-UI/blob/main/docs/estate-audit.md) of 2026-08-11/12).
 
-## One team, two organizations
+## One team, three GitHub accounts
 
-Brainstorm is a personalized web-of-trust system for nostr: it computes contextual trust scores (GrapeRank) from each observer's point of view and publishes them back to nostr as signed events. The work spans two GitHub organizations operated by the same team. The deployments resemble one another because they share codebases at different release stages — they are not clones operated by different parties.
+Brainstorm is a personalized web-of-trust system for nostr: it computes contextual trust scores (GrapeRank) from each observer's point of view and publishes them back to nostr as signed events. The work spans three GitHub accounts operated by the same team. The deployments resemble one another because they share codebases at different release stages — they are not clones operated by different parties.
 
 | Organization | Role |
 |---|---|
 | [NosFabrica](https://github.com/NosFabrica) | Production. The company ([nosfabrica.com](https://nosfabrica.com)); operates the flagship deployment at [brainstorm.world](https://brainstorm.world). |
-| [nous-clawds4](https://github.com/nous-clawds4) | Research & development. Protocols and features are drafted, piloted, and hardened here first. |
+| [nousclawds4](https://github.com/nousclawds4) | Research & development. Protocols and features are drafted, piloted, and hardened here first, in tapestry, which moved here from nous-clawds4 in October 2026. |
+| [nous-clawds4](https://github.com/nous-clawds4) | Research & development: the CLIs. Its own copy of tapestry is no longer the team's. |
 
-Work graduates from R&D to production: features and specs are developed and proven in `nous-clawds4/tapestry`, then adopted by the NosFabrica repositories. Cross-org contributions flow by fork and pull request. Protocol maturation follows the same gradient — see the [maturity model](./README.md#maturity-model).
+Work graduates from R&D to production: features and specs are developed and proven in `nousclawds4/tapestry`, then adopted by the NosFabrica repositories. Cross-org contributions flow by fork and pull request. Protocol maturation follows the same gradient — see the [maturity model](./README.md#maturity-model).
 
 ## Repositories
 
 | Repository | Org | Role |
 |---|---|---|
-| [tapestry](https://github.com/nous-clawds4/tapestry) | nous-clawds4 | R&D application: local-first personal knowledge graph and web-of-trust engine. Reference implementation for most specs in this repo; drafting workshop in [`protocols/`](https://github.com/nous-clawds4/tapestry/blob/main/protocols/README.md); canonical concept docs in [`BIBLE.md`](https://github.com/nous-clawds4/tapestry/blob/main/BIBLE.md). |
+| [tapestry](https://github.com/nousclawds4/tapestry) | nousclawds4 | R&D application: local-first personal knowledge graph and web-of-trust engine. Reference implementation for most specs in this repo; drafting workshop in [`protocols/`](https://github.com/nousclawds4/tapestry/blob/main/protocols/README.md); canonical concept docs in [`BIBLE.md`](https://github.com/nousclawds4/tapestry/blob/main/BIBLE.md). |
 | [tapestry-cli](https://github.com/nous-clawds4/tapestry-cli) | nous-clawds4 | CLI for curating concepts via the Tapestry Protocol — the agent-facing interface to tapestry. |
 | [brainstorm-cli](https://github.com/nous-clawds4/brainstorm-cli) | nous-clawds4 | CLI enabling LLM agents to use the production Brainstorm backend. |
 | [Brainstorm-UI](https://github.com/NosFabrica/Brainstorm-UI) | NosFabrica | Production web UI (React + TypeScript + Vite, served by nginx). |
@@ -48,7 +49,7 @@ contact are those repositories' own.
 
 All hosts below are operated by the same team; both the `brainstorm.world` and `nosfabrica.com` domains are ours.
 
-**Division of authority.** This file is the canonical *inventory*: the full list of hosts and their roles is normative here. The ownership *attestation* — the security-policy statement that these deployments are ours, together with how to report a vulnerability — lives in each codebase's SECURITY.md ([Brainstorm-UI/SECURITY.md](https://github.com/NosFabrica/Brainstorm-UI/blob/main/SECURITY.md), [tapestry/SECURITY.md](https://github.com/nous-clawds4/tapestry/blob/main/SECURITY.md)), scoped to the hosts that codebase serves, and is what each host's `/.well-known/security.txt` (RFC 9116) points at. Those scoped tables are deliberate copies: if one of them disagrees with this file, this file is right and the copy has a bug.
+**Division of authority.** This file is the canonical *inventory*: the full list of hosts and their roles is normative here. The ownership *attestation* — the security-policy statement that these deployments are ours, together with how to report a vulnerability — lives in each codebase's SECURITY.md ([Brainstorm-UI/SECURITY.md](https://github.com/NosFabrica/Brainstorm-UI/blob/main/SECURITY.md), [tapestry/SECURITY.md](https://github.com/nousclawds4/tapestry/blob/main/SECURITY.md)), scoped to the hosts that codebase serves, and is what each host's `/.well-known/security.txt` (RFC 9116) points at. Those scoped tables are deliberate copies: if one of them disagrees with this file, this file is right and the copy has a bug.
 
 **Product UI — Brainstorm-UI**
 

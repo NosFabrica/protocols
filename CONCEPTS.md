@@ -42,7 +42,7 @@ Terms that recur across the estate but are owned by no single spec:
 - **Preset** — a named parameter bundle for the scoring algorithm (e.g. default / permissive / restrictive). Scores are parameter-relative as well as Observer-relative, so a preset is part of the claim a score makes. Parameter semantics: [graperank.md](./specs/graperank.md); preset values are provider policy.
 - **Verified (count)** — of an Observee's raters, how many themselves clear a trust threshold in the same Observer's web. "Verified followers" answers *"how many accounts that I'd trust follow this person?"* — a sybil-resistant refinement of a raw follower count. Thresholds are preset-relative.
 - **Valid** (publish-worthy) — clearing the provider's publish cutoff, i.e. scoring high enough that a Trusted Assertion is published at all. Orthogonal to *verified*: a rater can count as verified without itself being published, and vice versa.
-- **The estate** — the repositories and deployments implementing all of this, across two organizations operated by one team. Canonical inventory: [ECOSYSTEM.md](./ECOSYSTEM.md).
+- **The estate** — the repositories and deployments implementing all of this, across three GitHub accounts operated by one team. Canonical inventory: [ECOSYSTEM.md](./ECOSYSTEM.md).
 
 ## The concept graph's vocabulary
 
