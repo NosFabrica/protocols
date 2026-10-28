@@ -1,7 +1,7 @@
 # Concepts
 
 > **Role:** the conceptual canon behind the specs in this repo — the model that makes them make sense. This is apparatus, not a specification: nothing here is normative for wire formats, and where a term has a normative definition in a spec, this document points there instead of redefining it.
-> **Last updated:** 2026-08-18. **Sources:** distilled from `brainstorm_server/CONTEXT.md`, tapestry's architecture invariants (`CLAUDE.md`) and SECURITY.md trust-model note, and the two specs below.
+> **Last updated:** 2026-10-28. **Sources:** distilled from `brainstorm_server/CONTEXT.md`, tapestry's architecture invariants (`CLAUDE.md`) and SECURITY.md trust-model note, and the two specs below; the concept graph's vocabulary from tapestry's BIBLE (§§ 6, 21, 23) and its Class Thread Relationships draft.
 
 Brainstorm computes **personalized web-of-trust scores** for nostr. Five claims define the model; everything in [trusted-assertions.md](./specs/trusted-assertions.md) and [graperank.md](./specs/graperank.md) is downstream of them.
 
@@ -43,6 +43,31 @@ Terms that recur across the estate but are owned by no single spec:
 - **Verified (count)** — of an Observee's raters, how many themselves clear a trust threshold in the same Observer's web. "Verified followers" answers *"how many accounts that I'd trust follow this person?"* — a sybil-resistant refinement of a raw follower count. Thresholds are preset-relative.
 - **Valid** (publish-worthy) — clearing the provider's publish cutoff, i.e. scoring high enough that a Trusted Assertion is published at all. Orthogonal to *verified*: a rater can count as verified without itself being published, and vice versa.
 - **The estate** — the repositories and deployments implementing all of this, across two organizations operated by one team. Canonical inventory: [ECOSYSTEM.md](./ECOSYSTEM.md).
+
+## The concept graph's vocabulary
+
+Tapestry turns flat nostr lists into a graph of concepts. The mistake that recurs in modelling with it is treating two different things as one, so these words are kept apart, and this is the one place they are defined. Other glossaries, such as tapestry's BIBLE § 21, point here. Where a spec owns a term's wire format, the term links to it.
+
+- **Concept** — an abstract idea, such as *widget* or *Irish setter*. It is not the set of things it describes: the idea of a widget is one thing, and all the widgets there are is another. A concept lives in a graph database (Neo4j, in the reference implementation), where its class thread gives it structure.
+- **Superset** — the set of everything a concept describes: *all widgets*, *all Irish setters*. A concept points to its superset (`IS_THE_CONCEPT_FOR`).
+- **Element**, or **instance** — one member of a set: *the widget on my table*, *Spot*. As an object is to its class in object-oriented programming, an element is an instance of the idea, not the idea.
+- **Subset** — a set whose members all belong to a larger set: *Irish setters*, the set, is a subset of *dogs*.
+
+The test case: *Irish setters*, the superset, is a subset of *dogs*. *Irish setter*, the abstract concept, is not a subset of dogs: it is an element of the list of *dog breeds*.
+
+- **DList** — a decentralized list, the nostr form of a concept: a header (kind `39998` or `9998`) that names the list and its fields, and items (kind `39999` or `9999`) that point to it with a `z` tag. A DList lives on nostr, and a concept lives in a graph database; a concept often begins as a DList. Wire format: [Decentralized Lists](https://github.com/nousclawds4/tapestry/blob/staging/protocols/nips/decentralized-lists.md).
+- **Class thread** — the path that structures a concept in the graph, in three relationship types:
+  - **initiation**: the concept to its superset (`IS_THE_CONCEPT_FOR`);
+  - **propagation**: a superset to its subsets, zero or more hops (`IS_A_SUPERSET_OF`);
+  - **termination**: a set to its elements (`HAS_ELEMENT`).
+
+  Wire format for propagation and termination: [Class Thread Relationships](https://github.com/nousclawds4/tapestry/blob/staging/protocols/drafts/class-thread-relationships.md) (`n`, `s`).
+- **Vertical integration** — joining concepts up and down a class thread, in two kinds:
+  - **by subset** (propagation): *Irish setters* is a subset of *dogs*, and *restaurants in Boston* is a subset of *restaurants*;
+  - **by element** (termination): *Spot* is an element of *Irish setters*.
+- **Horizontal integration** — joining concepts across, rather than up and down: one concept's elements are the values allowed for a property of another, through an `ENUMERATES` edge from the first concept's superset to that property. The elements of *dog breeds* are the values allowed for a dog's breed.
+
+**Retired words.** None yet. When one of these words is renamed, the old word is listed here with the word that replaced it, so older writing still reads correctly.
 
 ## What this document is not
 
