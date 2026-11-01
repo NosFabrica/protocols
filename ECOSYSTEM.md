@@ -1,6 +1,6 @@
 # The Brainstorm/Tapestry Ecosystem
 
-**Last updated: 2026-10-28.** The map of the estate behind the specs in this repo: the organizations, repositories, and deployments, and how work flows between them. If you are evaluating these protocols, this file answers *who implements them, where, and at what release stage*.
+**Last updated: 2026-10-29.** The map of the estate behind the specs in this repo: the organizations, repositories, and deployments, and how work flows between them. If you are evaluating these protocols, this file answers *who implements them, where, and at what release stage*.
 
 This file is the **canonical inventory** of the estate: the lists of repositories, hostnames, and roles are normative here. Two related things live elsewhere by design: the security-facing ownership *attestation* belongs to each codebase's SECURITY.md (see [Deployments](#deployments)), and per-host operational *status* belongs to point-in-time surveys (the most recent: the [estate audit](https://github.com/NosFabrica/Brainstorm-UI/blob/main/docs/estate-audit.md) of 2026-08-11/12).
 
@@ -24,12 +24,14 @@ Work graduates from R&D to production: features and specs are developed and prov
 | [tapestry-cli](https://github.com/nous-clawds4/tapestry-cli) | nous-clawds4 | CLI for curating concepts via the Tapestry Protocol — the agent-facing interface to tapestry. |
 | [brainstorm-cli](https://github.com/nous-clawds4/brainstorm-cli) | nous-clawds4 | CLI enabling LLM agents to use the production Brainstorm backend. |
 | [Brainstorm-UI](https://github.com/NosFabrica/Brainstorm-UI) | NosFabrica | Production web UI (React + TypeScript + Vite, served by nginx). |
-| [brainstorm_server](https://github.com/NosFabrica/brainstorm_server) | NosFabrica | Production backend (Python/FastAPI): ingests nostr events, maintains the follow/mute/report graph (Neo4j), schedules GrapeRank runs, publishes Trusted Assertions, serves profile search (Vespa). |
+| [brainstorm_server](https://github.com/NosFabrica/brainstorm_server) | NosFabrica | Production backend (Python/FastAPI): ingests nostr events, maintains the follow/mute/report graph (Neo4j), schedules GrapeRank runs, publishes Trusted Assertions, serves the HTTP API (its search endpoint forwards to vespa-relay). |
 | [brainstorm_graperank_algorithm](https://github.com/NosFabrica/brainstorm_graperank_algorithm) | NosFabrica | The GrapeRank computation itself — the Java worker invoked per run. |
 | [brainstorm-k8s](https://github.com/NosFabrica/brainstorm-k8s) | NosFabrica | Kubernetes charts for the production and staging fleets (private). |
 | [brainstorm_one_click_deployment](https://github.com/NosFabrica/brainstorm_one_click_deployment) | NosFabrica | Docker-based deployment bundle, including the Vespa application package. |
 | [brainstorm_integration_tests](https://github.com/NosFabrica/brainstorm_integration_tests) | NosFabrica | Integration tests for queueing GrapeRank calculations in bulk. |
 | [neofry](https://github.com/NosFabrica/neofry), [strfry](https://github.com/NosFabrica/strfry) | NosFabrica | The estate's nostr relays (strfry-based). |
+| [vespa-relay](https://github.com/NosFabrica/vespa-relay) | NosFabrica | The search relay (Kotlin): a Vespa-backed nostr relay that filters and ranks REQs, COUNTs and NIP-50 search through each connecting user's NIP-85 web of trust. |
+| [vespa-eventstore](https://github.com/NosFabrica/vespa-eventstore) | NosFabrica | The Vespa-backed event store behind vespa-relay. |
 | protocols (this repo) | NosFabrica | Shared protocol specifications and this map. |
 
 **Lineage:** the historical protocol repos [wds4/DCoSL](https://github.com/wds4/DCoSL) and [wds4/tapestry-protocol](https://github.com/wds4/tapestry-protocol) (superseded by the specs indexed here), and the original [Brainstorm prototype](https://github.com/pretty-good-freedom-tech/brainstorm), are the ancestors of the current estate.
@@ -65,16 +67,21 @@ All hosts below are operated by the same team; both the `brainstorm.world` and `
 |---|---|
 | tapestry.brainstorm.world | Reference deployment |
 | staging.brainstorm.world | Pre-production |
-| tags.brainstorm.world, communities.brainstorm.world, magic-carpet.brainstorm.world, curate.brainstorm.world | Feature sandboxes |
+| tags.brainstorm.world, magic-carpet.brainstorm.world | Feature sandboxes |
 
 **Backend APIs — brainstorm_server**
 
 | Host | Role |
 |---|---|
 | api.brainstorm.world | Production API |
-| search.brainstorm.world | Search API |
 | brainstormserver.nosfabrica.com | Production API |
 | brainstormserver-staging.nosfabrica.com | Staging API |
+
+**Search relay — vespa-relay**
+
+| Host | Role |
+|---|---|
+| search.brainstorm.world | Search relay (NIP-50) |
 
 **Relays — strfry/neofry**
 
@@ -90,7 +97,7 @@ All hosts below are operated by the same team; both the `brainstorm.world` and `
 
 1. Nostr events — follows, mutes, reports, profiles — are ingested by `brainstorm_server`, which maintains the social graph in Neo4j.
 2. A **Brainstorm request** runs the GrapeRank calculation (the Java worker) for one **Observer**, assigning every reachable user an **Influence** score in [0, 1] from that observer's point of view.
-3. Above-cutoff scores are published as **Trusted Assertions** — signed kind-30382 events whose `rank` tag carries `round(Influence × 100)` and whose `hops` tag carries follow-path distance — to the estate's relays, and mirrored into Vespa for search.
+3. Above-cutoff scores are published as **Trusted Assertions** — signed kind-30382 events whose `rank` tag carries `round(Influence × 100)` and whose `hops` tag carries follow-path distance — to the estate's relays. The search relay mirrors them and ranks search results through them.
 4. Clients — the Brainstorm UI, tapestry, and any third-party consumer — read Trusted Assertions from relays and filter or rank content per point of view.
 
 The event formats and semantics in steps 2–4 are exactly what this repo specifies.
