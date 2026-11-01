@@ -1,0 +1,181 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/NosFabrica/protocols/main/specs/interpretation.schema.json",
+  "title": "Interpretation set, version 0",
+  "description": "A ranked set of typed readings of one search question. Normative prose: specs/interpretation.md.",
+  "type": "object",
+  "required": ["version", "interpretations"],
+  "additionalProperties": false,
+  "properties": {
+    "version": {
+      "enum": ["0"],
+      "description": "The interpretation schema version this set is written against."
+    },
+    "query": {
+      "type": "string",
+      "description": "The words the asker typed, when there were any. Absent when a producer built the set without a string."
+    },
+    "interpretations": {
+      "type": "array",
+      "minItems": 1,
+      "description": "Candidate readings, best first.",
+      "items": { "$ref": "#/$defs/interpretation" }
+    }
+  },
+  "$defs": {
+    "interpretation": {
+      "type": "object",
+      "required": ["targets", "filters", "pov", "residual_words", "confidence"],
+      "additionalProperties": false,
+      "properties": {
+        "targets": {
+          "type": "array",
+          "minItems": 1,
+          "description": "The content categories being asked about. Several targets are a union.",
+          "items": { "$ref": "#/$defs/target" }
+        },
+        "filters": {
+          "type": "array",
+          "description": "Property constraints on the items. Several filters are a conjunction.",
+          "items": { "$ref": "#/$defs/filter" }
+        },
+        "place": { "$ref": "#/$defs/place" },
+        "time": { "$ref": "#/$defs/time" },
+        "pov": { "$ref": "#/$defs/pov" },
+        "residual_words": {
+          "type": "array",
+          "description": "Words no field claimed. Matched as text or by embedding inside the set the other fields select.",
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "confidence": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "The producer's confidence in this reading, within this set only."
+        }
+      }
+    },
+    "target": {
+      "type": "object",
+      "required": ["type"],
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "enum": ["profile", "event-kind", "dlist", "external"],
+          "description": "The content category type (Content Categories, table in its preamble)."
+        },
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "description": "The category slot value: absent for profile, the kind number for event-kind, a canonical naddr or nevent for dlist, the NIP-73 type for external."
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "required": ["type"],
+            "properties": { "type": { "enum": ["profile"] } }
+          },
+          "then": { "not": { "required": ["id"] } },
+          "else": { "required": ["id"] }
+        }
+      ]
+    },
+    "filter": {
+      "type": "object",
+      "required": ["property", "value"],
+      "additionalProperties": false,
+      "properties": {
+        "property": {
+          "type": "string",
+          "minLength": 1,
+          "description": "A property named by the target's DList header schema, or by the NIP defining the event kind."
+        },
+        "value": { "type": "string", "minLength": 1 }
+      }
+    },
+    "place": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "A geographic constraint. At least one of geohash or near_observer is required.",
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "description": "The place as the asker named it, for display. Never the constraint itself."
+        },
+        "geohash": {
+          "type": "string",
+          "pattern": "^[0123456789bcdefghjkmnpqrstuvwxyz]{1,12}$",
+          "description": "The centre of the radius, as a geohash cell. The compiler derives the covering cells."
+        },
+        "radius_km": { "type": "number", "minimum": 0 },
+        "near_observer": {
+          "type": "boolean",
+          "description": "True when the asker said \"near me\" and the centre is the asker's own location."
+        }
+      },
+      "anyOf": [{ "required": ["geohash"] }, { "required": ["near_observer"] }]
+    },
+    "time": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "A constraint on when the thing starts. At least one bound is required.",
+      "properties": {
+        "label": {
+          "type": "string",
+          "minLength": 1,
+          "description": "The window as the asker named it, for display. Never the constraint itself."
+        },
+        "start_since": {
+          "type": "integer",
+          "description": "Unix seconds. The earliest start, inclusive."
+        },
+        "start_until": {
+          "type": "integer",
+          "description": "Unix seconds. The latest start, inclusive."
+        }
+      },
+      "anyOf": [{ "required": ["start_since"] }, { "required": ["start_until"] }]
+    },
+    "pov": {
+      "type": "object",
+      "required": ["observer", "scope"],
+      "additionalProperties": false,
+      "properties": {
+        "observer": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$",
+          "description": "The pubkey whose web of trust ranks the results, as 64 lowercase hex. An npub is not an observer."
+        },
+        "scope": { "$ref": "#/$defs/scope" }
+      }
+    },
+    "scope": {
+      "type": "object",
+      "required": ["mode"],
+      "additionalProperties": false,
+      "properties": {
+        "mode": {
+          "enum": ["default", "named-group", "inferred-group"],
+          "description": "Whose curation counts inside the observer's web of trust. What default means is G4.1's to define."
+        },
+        "group": {
+          "type": "string",
+          "minLength": 1,
+          "description": "The group, as a canonical naddr or nevent for a DList, or 64 lowercase hex for a single pubkey."
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "required": ["mode"],
+            "properties": { "mode": { "enum": ["default"] } }
+          },
+          "then": { "not": { "required": ["group"] } },
+          "else": { "required": ["group"] }
+        }
+      ]
+    }
+  }
+}
