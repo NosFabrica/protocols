@@ -1,7 +1,7 @@
 # Concepts
 
 > **Role:** the conceptual canon behind the specs in this repo — the model that makes them make sense. This is apparatus, not a specification: nothing here is normative for wire formats, and where a term has a normative definition in a spec, this document points there instead of redefining it.
-> **Last updated:** 2026-10-28. **Sources:** distilled from `brainstorm_server/CONTEXT.md`, tapestry's architecture invariants (`CLAUDE.md`) and SECURITY.md trust-model note, and the two specs below; the concept graph's vocabulary from tapestry's BIBLE (§§ 6, 21, 23) and its Class Thread Relationships draft.
+> **Last updated:** 2026-11-02. **Sources:** distilled from `brainstorm_server/CONTEXT.md`, tapestry's architecture invariants (`CLAUDE.md`) and SECURITY.md trust-model note, and the two specs below; the concept graph's vocabulary from tapestry's BIBLE (§§ 6, 21, 23) and its Class Thread Relationships draft.
 
 Brainstorm computes **personalized web-of-trust scores** for nostr. Five claims define the model; everything in [trusted-assertions.md](./specs/trusted-assertions.md) and [graperank.md](./specs/graperank.md) is downstream of them.
 
@@ -42,6 +42,14 @@ Terms that recur across the estate but are owned by no single spec:
 - **Preset** — a named parameter bundle for the scoring algorithm (e.g. default / permissive / restrictive). Scores are parameter-relative as well as Observer-relative, so a preset is part of the claim a score makes. Parameter semantics: [graperank.md](./specs/graperank.md); preset values are provider policy.
 - **Verified (count)** — of an Observee's raters, how many themselves clear a trust threshold in the same Observer's web. "Verified followers" answers *"how many accounts that I'd trust follow this person?"* — a sybil-resistant refinement of a raw follower count. Thresholds are preset-relative.
 - **Valid** (publish-worthy) — clearing the provider's publish cutoff, i.e. scoring high enough that a Trusted Assertion is published at all. Orthogonal to *verified*: a rater can count as verified without itself being published, and vice versa.
+- **Interpretation** — one typed reading of a search question: what is being asked for, constrained how, and from whose point of view. An object, never a rewritten query string, and one question may have several, ranked, each with a confidence. A query parser, an agent and a partner's service all produce the same shape, and a compiler turns it into a relay's filters. Distinguish it from the *act* of interpreting, which is what an interpreter does, and from a reader's interpretation of a result, which this vocabulary does not name. Wire format: [interpretation.md](./specs/interpretation.md).
+- **Schema** — four different things across the estate, so a bare "schema" is ambiguous and the kind should be named:
+  - the **interpretation schema** — the JSON Schema that validates an interpretation ([interpretation.schema.json](./specs/interpretation.schema.json));
+  - a **DList header's schema** — the fields, types and display roles a header declares for its items ([Decentralized Lists](https://github.com/nousclawds4/tapestry/blob/staging/protocols/nips/decentralized-lists.md));
+  - a concept's **JSON Schema core node** — one of the eight core nodes a fully-formed concept has, validating that concept's elements ([Tapestry Concepts](https://github.com/nousclawds4/tapestry/blob/staging/protocols/drafts/tapestry-concepts.md) § Core nodes of a concept);
+  - the **search index's schema** — `event.sd` in the search relay's Vespa application package, which is a document definition and not a JSON Schema at all.
+
+  The first three are JSON Schemas and the fourth is not, which is the confusion worth avoiding.
 - **The estate** — the repositories and deployments implementing all of this, across three GitHub accounts operated by one team. Canonical inventory: [ECOSYSTEM.md](./ECOSYSTEM.md).
 
 ## The concept graph's vocabulary
