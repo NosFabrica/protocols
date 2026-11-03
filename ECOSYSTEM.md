@@ -1,6 +1,6 @@
 # The Brainstorm/Tapestry Ecosystem
 
-**Last updated: 2026-10-29.** The map of the estate behind the specs in this repo: the organizations, repositories, and deployments, and how work flows between them. If you are evaluating these protocols, this file answers *who implements them, where, and at what release stage*.
+**Last updated: 2026-11-03.** The map of the estate behind the specs in this repo: the organizations, repositories, and deployments, and how work flows between them. If you are evaluating these protocols, this file answers *who implements them, where, and at what release stage*.
 
 This file is the **canonical inventory** of the estate: the lists of repositories, hostnames, and roles are normative here. Two related things live elsewhere by design: the security-facing ownership *attestation* belongs to each codebase's SECURITY.md (see [Deployments](#deployments)), and per-host operational *status* belongs to point-in-time surveys (the most recent: the [estate audit](https://github.com/NosFabrica/Brainstorm-UI/blob/main/docs/estate-audit.md) of 2026-08-11/12).
 
@@ -13,6 +13,8 @@ Brainstorm is a personalized web-of-trust system for nostr: it computes contextu
 | [NosFabrica](https://github.com/NosFabrica) | Production. The company ([nosfabrica.com](https://nosfabrica.com)); operates the flagship deployment at [brainstorm.world](https://brainstorm.world). |
 | [nousclawds4](https://github.com/nousclawds4) | Research & development. Protocols and features are drafted, piloted, and hardened here first, in tapestry, which moved here from nous-clawds4 in October 2026. |
 | [nous-clawds4](https://github.com/nous-clawds4) | Research & development: the CLIs. Its own copy of tapestry is no longer the team's. |
+
+One repository in the list below, curate, sits on a team member's own account, [aburra16](https://github.com/aburra16).
 
 Work graduates from R&D to production: features and specs are developed and proven in `nousclawds4/tapestry`, then adopted by the NosFabrica repositories. Cross-org contributions flow by fork and pull request. Protocol maturation follows the same gradient — see the [maturity model](./README.md#maturity-model).
 
@@ -32,6 +34,7 @@ Work graduates from R&D to production: features and specs are developed and prov
 | [neofry](https://github.com/NosFabrica/neofry), [strfry](https://github.com/NosFabrica/strfry) | NosFabrica | The estate's nostr relays (strfry-based). |
 | [vespa-relay](https://github.com/NosFabrica/vespa-relay) | NosFabrica | The search relay (Kotlin): a Vespa-backed nostr relay that filters and ranks REQs, COUNTs and NIP-50 search through each connecting user's NIP-85 web of trust. |
 | [vespa-eventstore](https://github.com/NosFabrica/vespa-eventstore) | NosFabrica | The Vespa-backed event store behind vespa-relay. |
+| [curate](https://github.com/aburra16/curate) | aburra16 | Explorer and editor for Decentralized Lists: browse, create and edit lists and items in the browser, using Brainstorm-UI's list code. |
 | protocols (this repo) | NosFabrica | Shared protocol specifications and this map. |
 
 **Lineage:** the historical protocol repos [wds4/DCoSL](https://github.com/wds4/DCoSL) and [wds4/tapestry-protocol](https://github.com/wds4/tapestry-protocol) (superseded by the specs indexed here), and the original [Brainstorm prototype](https://github.com/pretty-good-freedom-tech/brainstorm), are the ancestors of the current estate.
@@ -68,6 +71,12 @@ All hosts below are operated by the same team; both the `brainstorm.world` and `
 | tapestry.brainstorm.world | Reference deployment |
 | staging.brainstorm.world | Pre-production |
 | tags.brainstorm.world, magic-carpet.brainstorm.world | Feature sandboxes |
+
+**List explorer — curate**
+
+| Host | Role |
+|---|---|
+| curate.brainstorm.world | Production |
 
 **Backend APIs — brainstorm_server**
 
