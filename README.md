@@ -70,6 +70,7 @@ Migration into this repo is gradual; "Lives today" names the current normative h
 | Profile Presentation | 📝 pre-NIP | [Brainstorm-UI/docs/nips/](https://github.com/NosFabrica/Brainstorm-UI/blob/main/docs/nips/profile-presentation.md) |
 | Trusted Assertions consumer spec (kind 30382: `rank`, `hops` semantics) | 📝 pre-NIP | [specs/trusted-assertions.md](./specs/trusted-assertions.md) |
 | GrapeRank — personalized trust-score computation | 📝 pre-NIP | [specs/graperank.md](./specs/graperank.md) |
+| Vouch List — a deliberate endorsement set (kind 30000, `d` = `vouches`) | 📝 pre-NIP | [specs/vouch-list.md](./specs/vouch-list.md) |
 | Interpretation — the typed search question (v0.1) | 📝 pre-NIP | [specs/interpretation.md](./specs/interpretation.md) |
 
 ## How a spec gets here
