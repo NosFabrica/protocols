@@ -1,7 +1,7 @@
 > **Repo metadata — not part of the spec text.**
 > **Status:** 📝 pre-NIP
 > **Canonical:** not yet published
-> **Last updated:** 2026-11-03
+> **Last updated:** 2026-11-05
 > **Sources:** `NosFabrica/brainstorm_server` (`app/message_queue_tasks/process_strfry_event.py` — the ingestion this spec transcribes); `NosFabrica/brainstorm_graperank_algorithm` (the consumer).
 > **Adopted by:** `brainstorm_server` (ingestion), `brainstorm_graperank_algorithm` (scoring).
 > **Companion:** [graperank.md](./graperank.md) — the computation a vouch feeds.
@@ -24,12 +24,12 @@ reads a vouch as a separate rating kind with its own parameters — lives in
 
 ## Event shape
 
-A vouch list is a NIP-51 **follow set** — kind `30003` — whose `d` tag is
+A vouch list is a NIP-51 **follow set** — kind `30000` — whose `d` tag is
 exactly `vouches`:
 
 ```json
 {
-  "kind": 30003,
+  "kind": 30000,
   "tags": [
     ["d", "vouches"],
     ["p", "<vouched pubkey, 64 hex>"],
@@ -39,7 +39,7 @@ exactly `vouches`:
 }
 ```
 
-- **Addressable and replaceable.** Per NIP-01, a newer kind-30003 event with
+- **Addressable and replaceable.** Per NIP-01, a newer kind-30000 event with
   `d = "vouches"` from the same author replaces the older one wholesale. The
   newest list is the whole list; an empty `p` set retracts every vouch.
 - **One list per author.** An author has exactly one vouch list (the `d` value
@@ -50,9 +50,10 @@ exactly `vouches`:
   (`interesting-people`, `muted`, …) are ordinary NIP-51 lists and carry no
   assertion. Consumers MUST NOT read them as vouches.
 
-Riding kind 30003 — rather than a dedicated kind — is deliberate: any client
-that can publish a follow set can publish a vouch list today, and relays that
-accept NIP-51 lists already store and serve it.
+Using NIP-51's follow-set kind rather than a dedicated kind is deliberate: any
+client that can publish a follow set can publish a vouch list today, and relays
+that accept NIP-51 lists already store and serve it. Kind `30003` is reserved
+for bookmark sets and MUST NOT be used for vouch lists.
 
 ## Semantics
 

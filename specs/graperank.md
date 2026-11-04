@@ -1,7 +1,7 @@
 > **Repo metadata — not part of the spec text.**
 > **Status:** 📝 pre-NIP
 > **Canonical:** not yet published
-> **Last updated:** 2026-11-03
+> **Last updated:** 2026-11-05
 > **Sources:** `NosFabrica/brainstorm_graperank_algorithm` (`grape/GrapeRankAlgorithm.java`, `grape/Constants.java`, `grape/GrapeRankParams.java`, `rank/ScoreCard.java` — the reference implementation this spec transcribes); `NosFabrica/brainstorm_server` (preset seed migration `4fcfe9570a50`, `CONTEXT.md`); `nous-clawds4/tapestry` (`customers/default/preferences/graperank.conf`).
 > **Adopted by:** `brainstorm_graperank_algorithm` (production reference implementation), `tapestry` (JS variant — see *Implementation variance*).
 > **Companion:** [trusted-assertions.md](./trusted-assertions.md) — the wire format the outputs are published in; [vouch-list.md](./vouch-list.md) — the wire format vouch edges are read from.
@@ -38,7 +38,7 @@ Vertices are users (pubkeys). Directed edges come from public nostr events, one 
 | `FOLLOWS` | kind 3 (contact list) | one edge per listed `p` tag |
 | `MUTES` | kind 10000 (mute list) | |
 | `REPORTS` | kind 1984 (NIP-56) | **user-level reports only** — a `p`-tag report with no `e` tag; note/media reports are excluded |
-| `VOUCHES` | kind 30003, `d` = `vouches` (vouch list, [vouch-list.md](./vouch-list.md)) | one edge per listed `p` tag |
+| `VOUCHES` | kind 30000, `d` = `vouches` (vouch list, [vouch-list.md](./vouch-list.md)) | one edge per listed `p` tag |
 
 A rater who both follows and mutes the same target contributes two data points; likewise a follow and a vouch. The edges are distinct kinds with distinct weights — a vouch is a deliberate endorsement, a follow is ambient attention, and conflating them would let the cheap signal corrupt the costly one.
 
