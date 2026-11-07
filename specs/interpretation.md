@@ -29,7 +29,7 @@ This spec defines the **interpretation**: the typed form of one search question,
 - **Producer** — whatever built the set: a query parser, an agent, a partner's service, or a person filling in fields directly.
 - **Consumer** — whatever receives it: a compiler that turns it into a query, or a front end that renders it for the asker.
 - **Content category** — a kind of thing a person might look for: profiles, product listings, *Restaurants in Nashville*. Defined normatively in Content Categories (see *Sources*); this spec only references categories, and does not redefine them.
-- **Observer** — the pubkey whose web of trust ranks the results. Every result in this estate is relative to exactly one. There is no unranked answer.
+- **Observer** — the pubkey whose web of trust ranks the results. An interpretation always names one, because `pov` is required, so no interpretation asks an unranked question. The estate itself can answer one: a relay may serve the whole corpus unranked when asked to (NIP-50 `include:spam`), and that is not an interpretation's doing.
 
 ## 1. The interpretation set
 
@@ -100,7 +100,8 @@ Each target names one content category, in the same slot encoding the Treasure M
 - `geohash` is the **centre** of the radius, not the area, and it is **required**. A compiler derives the covering cells at whatever precision its index wants; a producer MUST NOT try to pick them.
 - `near_observer` is **display only**: `true` when the asker said "near me" and the `geohash` beside it is the asker's own location, so a front end can say "near you". It is not the constraint and never stands in for the centre. A producer that means "near me" resolves the centre itself and sends a `geohash`.
 
-  v0 let `near_observer` appear *instead* of a `geohash`, and that was a mistake rather than a convenience: the asker's own location is nowhere in this object, and nothing in any wire format downstream will supply it, so no consumer could serve such a place. It could only drop it — and a search that silently stops constraining looks exactly like a working search, which is the same fault this spec rejects for an `npub` observer in § 2.5. A `place` that constrains nothing MUST NOT be emitted, whether it carries only a `name` or only a flag.
+  v0 let `near_observer` appear *instead* of a `geohash`, and that was a mistake rather than a convenience: the asker's own location is nowhere in this object, and nothing in any wire format downstream will supply it, so no consumer could serve such a place. It could only drop it — and a search that silently stops constraining looks exactly like a working search, which is why this spec refuses it, as it refuses an `npub` observer in § 2.5. The relay happens to reject an `npub` outright rather than fall back quietly (§ 2.5), so the two differ in what goes wrong downstream; the spec does not rely on either behaviour. A `place` that constrains nothing MUST NOT be emitted, whether it carries only a `name` or only a flag.
+- **An absent `radius_km` means the cell the `geohash` names, at its own precision** — not a radius the compiler picks. A producer that means a radius sends one. (Said here because a compiler had to decide it and did: `compile-to-vespa.md` § 4.)
 - `name` is **display only**, so a front end can show the asker which place was understood. A compiler MUST NOT match it as text; that is what `residual_words` is for.
 
 ### 2.4 `time`
@@ -120,7 +121,7 @@ Each target names one content category, in the same slot encoding the Treasure M
 { "observer": "<64 lowercase hex>", "scope": { "mode": "default" } }
 ```
 
-- `observer` MUST be 64 lowercase hex characters. **An `npub` is not an observer**: the relay accepts the token and then ranks as though no observer were given, which looks like a working search returning the house's results. Producers convert; consumers reject anything that does not match.
+- `observer` MUST be 64 lowercase hex characters. **An `npub` is not an observer**: it is treated as naming no observer at all. Measured on `wss://search.brainstorm.world` on 2026-11-04, an unsigned socket sending `observer:<npub>` is refused with `auth-required` and the same message as a read naming no observer — "this relay answers through a web of trust and has no house observer to lend you" — while `include:spam` on the same socket is served. So the failure is a refusal, not a quiet fallback. On a socket already signed in under NIP-42 the identity could supply the lens and the token be ignored, which would be a quiet wrong answer; that case was not tested. Producers convert; consumers reject anything that does not match, under either behaviour.
 - `scope` says whose curation counts inside that observer's web of trust:
 
 | `mode` | Means | `group` |
@@ -128,7 +129,6 @@ Each target names one content category, in the same slot encoding the Treasure M
 | `default` | whatever the deployment takes "my people" to mean | **absent** |
 | `named-group` | a group the asker named | required |
 | `inferred-group` | a group the producer inferred from context, not from the asker's words | required |
-| | | |
 
 - `group` is a canonical `naddr` or `nevent` for a DList, or 64 lowercase hex for a single pubkey. It MUST be absent for `default` and present otherwise.
 - **What `default` means is not settled, and this spec does not settle it.** It is carried as a mode precisely so that the answer can land in one place later without changing this schema. A consumer MUST NOT assume `default` means the observer's follows.
@@ -202,8 +202,7 @@ The place constrains a geography, the item property constrains the kind of place
   "interpretations": [
     {
       "targets": [
-        { "type": "dlist", "id": "naddr1qq2kvmm0vskkzmny94j8y6twdvkhqmrpvdjhxq3q8a7yu8v69dvxvrc7f47r4xews52vd58h8wz6jg0y6lq0vw5ttcfqxpqqqzwruxt3dn9" },
-        { "type": "external", "id": "web" }
+        { "type": "dlist", "id": "naddr1qq2kvmm0vskkzmny94j8y6twdvkhqmrpvdjhxq3q8a7yu8v69dvxvrc7f47r4xews52vd58h8wz6jg0y6lq0vw5ttcfqxpqqqzwruxt3dn9" }
       ],
       "filters": [{ "property": "cuisine", "value": "brunch" }],
       "place": { "name": "Chicago", "geohash": "dp3wjzt", "radius_km": 25 },
@@ -233,7 +232,7 @@ The place constrains a geography, the item property constrains the kind of place
 
 Notes on this example:
 
-- The second target in the first reading is the external `web` category: a place's own page, commented on by trusted people, answers the same question when the curated list is thin. A producer that knows the list is sparse in a city can widen this way, and the confidence says how much it believes the widening.
+- **This example used to carry a second target**, the external `web` category, on the reasoning that a place's own page answers the same question when the curated list is thin. § 2.2 now forbids it from working: `cuisine` is replicated into every target, an `external` target cannot carry it, so that target returns nothing and the widening never happens. Widening a thin list this way needs per-target filters, which § 8's open question 4 holds as a v1 item — this is its motivating case, and the target is dropped until then.
 - `best` stays residual. Nothing in the data is called best; ranking by the observer's web of trust is what "best" asks for, and that is the engine's job, not a filter's.
 - 25 km matches how the places data was counted when the journey was chosen (see *Sources*).
 
@@ -293,6 +292,7 @@ Questions 2, 3 and 5 are **v1 items**: each needs a field this schema does not h
 3. **Negation.** *v1 item.* The search box accepts `-word` and this schema has nowhere to put it. As of v0.1 such a word MUST NOT be smuggled into `residual_words`, because carrying it there inverts its sense rather than merely losing it (§ 2.6); a producer drops it and lowers `confidence`. The fix is structure — either polarity on `residual_words` or negation in `filters`.
 4. **Whether `targets` can mix a union with a per-target filter.** **Resolved in principle, and a v1 item to carry out.** Writing the first compiler answered it: a union of targets compiles to one filter object per target *regardless*, because the types constrain different fields and cannot share one, so **per-target filters cost the wire format nothing**. v0's convention — producers keep mixed-type unions unfiltered — was therefore a workaround for a limitation the compile target does not have. What remains is the schema change, and it waits on purpose: moving the filter onto the target is a major change under § 9.2, and the second compiler (onto portable NIP-01 and NIP-50, deliberately weaker) has not been written yet. Designing the field against one index is how a schema acquires a field that suits one consumer. Until then § 2.2's consumer obligation holds.
 5. **Several places, several times.** *v1 item.* "Chicago or Milwaukee" and "Saturday or next Saturday" have no form here, and become separate interpretations. Whether that is the right answer or a missing array is open.
+6. **What a producer sends when the asker has no key.** `pov.observer` is required and MUST be 64 lowercase hex (§ 2.5), and that strictness is deliberate. But anonymous search is a first-class path in this estate, and a relay need not have a house observer to lend: measured on `wss://search.brainstorm.world` on 2026-11-04, an unsigned read naming no observer is refused `auth-required` with exactly that explanation, as is one naming an `npub`. So an interpretation for an asker with no key — or with a key whose scores have not been computed — has no observer to write down, and this spec does not say what to do. The candidates are a deployment-chosen stand-in key, refusing to produce an interpretation at all, and a scope or `pov` form meaning "no lens yet". Whether the answer needs a field it does not have is what decides whether this is a v1 item.
 
 ## 9. Versioning and breaking changes
 
