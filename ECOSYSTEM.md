@@ -63,6 +63,7 @@ All hosts below are operated by the same team; both the `brainstorm.world` and `
 | brainstorm.world | Production |
 | brainstorm.nosfabrica.com | Production alias |
 | brainstorm-staging.nosfabrica.com | Staging |
+| brainstorm-staging.relay.tools | Staging |
 
 **R&D UI — tapestry**
 
